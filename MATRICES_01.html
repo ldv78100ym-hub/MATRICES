@@ -20,12 +20,6 @@
         }
         h1, h2 {
             color: #333;
-            text-align: center;
-        }
-        h1 {
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
         }
         .exercice {
             margin-bottom: 30px;
@@ -37,493 +31,669 @@
         }
 
         /* ==========================================================
-                    STYLES DES BOUTONS ET CONTRÔLES
+                    STYLES DES BOUTONS
                 ========================================================== */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
         button {
+            background-color: #4CAF50; /* Vert pour l'action principale */
+            color: white;
             padding: 10px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 5px;
             transition: background-color 0.3s;
-            color: white;
         }
-
-        #generate-all {
-            background-color: #007bff;
+        button:hover {
+            background-color: #45a0a9;
         }
-        #generate-all:hover {
-            background-color: #0056b3;
+        .correction-btn {
+            background-color: #dc3545; /* Rouge pour les solutions */
         }
-        
-        .toggle-btn {
-            background-color: #28a745;
+        .correction-btn:hover {
+            background-color: #c82333;
         }
-        .toggle-btn:hover {
-            background-color: #1e7e34;
-        }
-        
-        /* Nouveau style pour le bouton Droits d'Auteur */
-        #copyright-btn {
-            background-color: #6c757d; 
-            color: white;
-        }
-        #copyright-btn:hover {
-            background-color: #5a6268;
-        }
-
 
         /* ==========================================================
-                    STYLES DES RÉSULTATS ET MATRICES
+                    AFFICHAGE DES MATRICES (MathJax)
                 ========================================================== */
-        .result, .solution {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid #007bff;
-            background-color: #e9f7ef;
-            display: none; /* Caché par défaut */
-            overflow-x: auto;
-        }
-        
-        .solution {
-            border-left-color: #28a745;
-            background-color: #d4edda;
-        }
-        
-        /* Style spécifique pour la section des droits d'auteur */
-        #copyright-content {
-            border-left-color: #6c757d;
-            background-color: #f8f9fa;
-        }
-        #copyright-content h3 {
-            color: #6c757d;
-            border-bottom: 1px solid #ddd;
+        .matrice-latex {
+            font-size: 1.2em;
+            display: block;
+            width: 100%; 
+            overflow-x: auto; /* Permet le défilement horizontal si la matrice est trop large */
+            margin: 10px 0;
             padding-bottom: 5px;
-            margin-bottom: 15px;
-        }
-        #copyright-content ul {
-            text-align: left;
-            margin-left: 20px;
         }
 
-        /* Style spécifique pour MathJax afin de centrer les matrices et aligner les systèmes */
-        .mjx-chtml {
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
+        /* ==========================================================
+                    BOÎTES DE QUESTION ET SOLUTION
+                ========================================================== */
+        .question-box {
+            padding: 15px;
+            margin-top: 20px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #eaf4ff;
         }
-        
+        .solution {
+            margin-top: 15px;
+            padding: 15px;
+            border-top: 2px dashed #4CAF50;
+            background-color: #e6ffe6;
+            border-radius: 0 0 8px 8px;
+        }
+        .error {
+            color: #b30000;
+            font-weight: bold;
+        }
+
+        /* ==========================================================
+                    STYLE DU TABLEAU GAUSS-JORDAN
+                ========================================================== */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .gauss-table {
+            min-width: 600px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .gauss-table th, .gauss-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .gauss-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .gauss-table td:nth-child(1) {
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <h1>Exercices sur les matrices</h1>
+    
+                <div class="exercice">
+        <h2>Exercice 1 : Compatibilité pour la somme ou le produit</h2>
+        <p>Générez deux matrices \( A \) et \( B \) et vérifiez si elles sont compatibles pour la somme ou le produit.</p>
+        <p>Effectuer les calculs pour lesquels les matrices sont compatibles.</p>
+        <button onclick="genererMatricesE1()">Générer les matrices</button>
+        <div id="matricesE1"></div>
+        <button id="showSolutionBtnE1" class="correction-btn" onclick="showSolution('E1')" style="display: none;">Afficher la Correction</button>
+        <div id="resultatE1"></div>
+    </div>
 
-    <h1>Exercices sur les Matrices</h1>
+                <div class="exercice">
+        <h2>Inversion d'une matrice carrée (\(2\times2\) ou \(3\times3\))</h2>
+        <button onclick="runRandomInverse()">Générer une matrice aléatoire</button>
+        
+        <div id="matriceDisplay"></div> 
+        
+        <button id="showCorrectionBtn" class="correction-btn" onclick="showCorrection()" style="display: none;">Afficher la Correction (Étapes de Gauss-Jordan)</button>
+        <div id="resultatCorrection"></div>
+    </div>
 
-    <div class="controls">
-        <button id="generate-all">Générer tous les exercices</button>
-        <button id="copyright-btn">⚖️ Droits d'auteur</button>
-    </div>
-    
-    <div id="copyright-content" class="result">
-        <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
-        <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Novembre 2025</p>
-        <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
-        <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
-        
-        <h4>Conditions :</h4>
-        <ul>
-            <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
-            <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
-            <li><strong>Attribution :** Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
-        </ul>
-        <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
-    </div>
+                <div class="exercice">
+        <h2>Exercice 3 : Résolution d'une équation matricielle \( A \cdot X = B \)</h2>
+        <p>Générez des matrices \( A \) et \( B \) compatibles pour résoudre l'équation \( A \cdot X = B \). La solution est \( X = A^{-1} \cdot B \).</p>
+        <button onclick="genererMatricesE3()">Générer les matrices</button>
+        <div id="matricesE3"></div>
+        <button id="showSolutionBtnE3" class="correction-btn" onclick="showSolution('E3')" style="display: none;">Afficher la solution \( X \)</button>
+        <div id="resultatE3"></div>
+    </div>
 
-    <div id="exercices-container">
-        </div>
+    
+                <script>
+        // Variables globales
+        let E1_data = {};
+        let E3_data = {};
+        let lastCorrectionHTML = ''; // Stocke le HTML des étapes de Gauss-Jordan pour l'exercice 2
 
-    <script>
-        // Déclaration des variables pour stocker les données des exercices
-        let E1_data = null; 
-        let E2_data = null;
-        let E3_data = null;
+        // ==========================================================
+        // --- LOGIQUE DE GESTION DES FRACTIONS (RATIONNELS) ---
+        // Les éléments de matrice sont des objets { num: nombre, den: nombre }
+        // ==========================================================
+        
+        function gcd(a, b) {
+          a = Math.abs(a); b = Math.abs(b);
+          while (b) [a, b] = [b, a % b];
+          return a;
+        }
+
+        function simplify({ num, den }) {
+          if (den === 0 || isNaN(num) || isNaN(den)) return { num: NaN, den: 1 };
+          if (num === 0) return { num: 0, den: 1 };
+          const g = gcd(num, den);
+          num /= g; den /= g;
+          if (den < 0) { num = -num; den = -den; }
+          return { num, den };
+        }
+
+        function toFraction(val) {
+          if (typeof val === 'object' && val !== null && val.num !== undefined) return simplify(val);
+          if (typeof val === 'number') return simplify({ num: val, den: 1 });
+          return { num: 0, den: 1 }; 
+        }
+
+        function add(a, b) {
+          a = toFraction(a); b = toFraction(b);
+          return simplify({ num: a.num * b.den + b.num * a.den, den: a.den * b.den });
+        }
+
+        function multiply(a, b) {
+          a = toFraction(a); b = toFraction(b);
+          return simplify({ num: a.num * b.num, den: a.den * b.den });
+        }
+
+        function divide(a, b) {
+          a = toFraction(a); b = toFraction(b);
+          if (b.num === 0) return { num: NaN, den: 0 }; // Division par zéro
+          return simplify({ num: a.num * b.den, den: a.den * b.num });
+        }
+        
+        function isZero(val) {
+             val = toFraction(val);
+             return val.num === 0;
+        }
+        
+        function formatValueToLaTeX(val) {
+            val = toFraction(val);
+            let { num, den } = val;
+
+            if (den === 0 || isNaN(num)) return '\\text{indéfini}'; 
+            if (num === 0) return '0';
+
+            if (den === 1) return num.toString();
+            // Gestion du signe pour la fraction
+            if (num < 0) {
+                return `-\\dfrac{${Math.abs(num)}}{${den}}`;
+            }
+            return `\\dfrac{${num}}{${den}}`;
+        }
+        
+        // ==========================================================
+        // --- FONCTIONS MATRICIELLES ---
+        // ==========================================================
+
+        function genererMatrice(n, p) {
+            let matrice = [];
+            for (let i = 0; i < n; i++) {
+                let ligne = [];
+                for (let j = 0; j < p; j++) {
+                    // Génère des entiers entre -5 et 5
+                    ligne.push(Math.floor(Math.random() * 11) - 5);
+                }
+                matrice.push(ligne);
+            }
+            return matrice.map(row => row.map(toFraction));
+        }
+        
+        function afficherMatrice(matrix) {
+            let latex = "\\begin{pmatrix}";
+            latex += matrix.map(row => row.map(formatValueToLaTeX).join(" & ")).join(" \\\\ ");
+            latex += "\\end{pmatrix}";
+            return latex;
+        }
+        
+        function cloneMatrix(M) {
+            return M.map(row => row.map(val => ({ ...val })));
+        }
+
+        function additionnerMatrices(A, B) {
+            const n = A.length;
+            const p = A[0].length;
+            let C = [];
+            for (let i = 0; i < n; i++) {
+                C[i] = [];
+                for (let j = 0; j < p; j++) {
+                    C[i][j] = add(A[i][j], B[i][j]);
+                }
+            }
+            return C;
+        }
+        
+        function multiplierMatrices(A, B) {
+            const nA = A.length;
+            const pA = A[0].length; // colonnes de A
+            const pB = B[0].length; // colonnes de B
+            
+            let C = [];
+            for (let i = 0; i < nA; i++) {
+                C[i] = [];
+                for (let j = 0; j < pB; j++) {
+                    let sum = toFraction(0); 
+                    for (let k = 0; k < pA; k++) {
+                        sum = add(sum, multiply(A[i][k], B[k][j]));
+                    }
+                    C[i][j] = sum;
+                }
+            }
+            return C;
+        }
+
+        function identityMatrix(n) {
+            return Array.from({ length: n }, (_, i) =>
+              Array.from({ length: n }, (_, j) => toFraction(i === j ? 1 : 0))
+            );
+        }
+
+        function augmentMatrix(A, I) {
+            return A.map((row, i) => [...row, ...I[i]]);
+        }
+        
+        // --- Logique d'Inversion (Gauss-Jordan avec fractions) ---
+        
+        function gaussJordanInverse(A) {
+          const n = A.length;
+          const I = identityMatrix(n);
+          let M = augmentMatrix(cloneMatrix(A), I);
+          const steps = [];
+
+          for (let j = 0; j < n; j++) {
+            // 1. Pivot non nul (y compris permutation)
+            if (isZero(M[j][j])) {
+              let swapped = false;
+              for (let i = j + 1; i < n; i++) {
+                if (!isZero(M[i][j])) {
+                  [M[j], M[i]] = [M[i], M[j]];
+                  steps.push({
+                    op: `Permutation \\( L_{${j + 1}} \\leftrightarrow L_{${i + 1}} \\)`,
+                    matrix: cloneMatrix(M).map(row => row.slice(0, n)),
+                    inverse: cloneMatrix(M).map(row => row.slice(n))
+                  });
+                  swapped = true;
+                  break;
+                }
+              }
+              if (!swapped && isZero(M[j][j])) return { success: false, inverse: null, steps }; // Matrice non inversible
+            }
+
+            // 2. Élimination (mettre des zéros au-dessus et en-dessous)
+            for (let i = 0; i < n; i++) {
+              if (i !== j && !isZero(M[i][j])) {
+                // Calcul du multiplicateur : c2 = M[i][j], c1 = M[j][j]
+                // Opération : L_i <- M[j][j] * L_i - M[i][j] * L_j
+                const M_jj = M[j][j];
+                const M_ij = M[i][j];
+                
+                // Utilisation d'un dénominateur commun pour simplifier l'opération
+                const denom = multiply(M_jj, M_ij);
+                const c1 = divide(M_jj, M_ij); // Simplifié pour l'affichage de l'opération
+                const c2 = toFraction(-1); // Pour L_i <- L_i - (M_ij/M_jj) * L_j (méthode standard)
+                
+                // Multiplicateur m = M[i][j] / M[j][j]
+                const m = divide(M_ij, M_jj);
+                const neg_m = multiply(m, -1);
+                
+
+                for (let k = 0; k < 2 * n; k++) {
+                  // L_i <- L_i + (-m) * L_j
+                  M[i][k] = add(M[i][k], multiply(neg_m, M[j][k]));
+                }
+
+                steps.push({
+                  op: `\\( L_{${i + 1}} \\leftarrow L_{${i + 1}} - ${formatValueToLaTeX(m)}L_{${j + 1}} \\)`,
+                  matrix: cloneMatrix(M).map(row => row.slice(0, n)),
+                  inverse: cloneMatrix(M).map(row => row.slice(n))
+                });
+              }
+            }
+          }
+
+          // 3. Normalisation finale (M[i][i] = 1)
+          for (let i = 0; i < n; i++) {
+            const pivot = M[i][i];
+            if (isZero(pivot)) return { success: false, inverse: null, steps };
+
+            if (pivot.num !== 1 || pivot.den !== 1) { // Normaliser seulement si ce n'est pas déjà 1
+              for (let j = 0; j < 2 * n; j++) {
+                M[i][j] = divide(M[i][j], pivot);
+              }
+              steps.push({
+                op: `\\( L_{${i + 1}} \\leftarrow \\dfrac{1}{${formatValueToLaTeX(pivot)}} L_{${i + 1}} \\)`,
+                matrix: cloneMatrix(M).map(row => row.slice(0, n)),
+                inverse: cloneMatrix(M).map(row => row.slice(n))
+              });
+            }
+          }
+
+          const inverse = M.map(row => row.slice(n));
+          return { success: true, inverse, steps };
+        }
+        
+        // Fonction d'inversion sans étapes (utilisée pour E3)
+        function inverserMatriceCalcul(A) {
+            const result = gaussJordanInverse(A);
+            return result.success ? result.inverse : null;
+        }
 
 
-        /* ==========================================================
-                        FONCTIONS UTILITAIRES DE BASE
-                ========================================================== */
+        // ==========================================================
+        // --- GESTION DE L'AFFICHAGE DES SOLUTIONS (E1 & E3) ---
+        // ==========================================================
+        
+        function showSolution(exoId) {
+            let solutionDiv = document.getElementById(`resultat${exoId}`);
+            let solutionBtn = document.getElementById(`showSolutionBtn${exoId}`);
+            let data;
+            let content = '';
+            
+            const possibleFormatted = '<span style="color: green; font-weight: bold;">Possible</span>';
+            const impossibleFormatted = '<span style="color: red; font-weight: bold;">Impossible</span>';
 
-        // Génère un entier aléatoire
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+            if (exoId === 'E1') {
+                data = E1_data;
+                
+                let sumStatus = data.sumPossible 
+                    ? `${possibleFormatted} (Résultat: \\( ${data.sumDim} \\))` 
+                    : `${impossibleFormatted} (Dimensions de \\( A \\): \\( ${data.n} \\times ${data.p} \\) \\(\\neq\\) Dimensions de \\( B \\): \\( ${data.nPrime} \\times ${data.pPrime} \\))`;
+                
+                let prodABStatus = data.prodABPossible 
+                    ? `${possibleFormatted} (Résultat: \\( ${data.prodABDim} \\))` 
+                    : `${impossibleFormatted} (Colonnes de \\( A \\): \\( ${data.p} \\) \\(\\neq\\) Lignes de \\( B \\): \\( ${data.nPrime} \\))`;
+                
+                let prodBAStatus = data.prodBAPossible 
+                    ? `${possibleFormatted} (Résultat: \\( ${data.prodBADim} \\))` 
+                    : `${impossibleFormatted} (Colonnes de \\( B \\): \\( ${data.pPrime} \\) \\(\\neq\\) Lignes de \\( A \\): \\( ${data.n} \\))`;
 
-        // Crée une matrice de taille m x n avec des entiers aléatoires entre min et max
-        function createRandomMatrix(m, n, min, max) {
-            const matrix = [];
-            for (let i = 0; i < m; i++) {
-                const row = [];
-                for (let j = 0; j < n; j++) {
-                    row.push(getRandomInt(min, max));
-                }
-                matrix.push(row);
-            }
-            return matrix;
-        }
+                content = `
+                    <h3>Correction des compatibilités et dimensions :</h3>
+                    <p>1. Somme \\( A + B \\) : ${sumStatus}</p>
+                    <p>2. Produit \\( A \\cdot B \\) : ${prodABStatus}</p>
+                    <p>3. Produit \\( B \\cdot A \\) : ${prodBAStatus}</p>
+                    
+                    <hr/>
+                    
+                    <h3>Résultats des opérations possibles :</h3>
+                `;
+                
+                if (data.sumPossible) {
+                    const resultSum = additionnerMatrices(data.A, data.B);
+                    content += `
+                        <h4>4. Calcul de la somme \\( A + B \\) :</h4>
+                        <p class="matrice-latex">
+                            \\( ${afficherMatrice(data.A)} + ${afficherMatrice(data.B)} = ${afficherMatrice(resultSum)} \\)
+                        </p>
+                    `;
+                } else {
+                    content += `<p>4. La somme \\( A + B \\) est impossible.</p>`;
+                }
+                
+                if (data.prodABPossible) {
+                    const resultProdAB = multiplierMatrices(data.A, data.B);
+                    content += `
+                        <h4>5. Calcul du produit \\( A \\cdot B \\) :</h4>
+                        <p class="matrice-latex">
+                            \\( ${afficherMatrice(data.A)} \\cdot ${afficherMatrice(data.B)} = ${afficherMatrice(resultProdAB)} \\)
+                        </p>
+                    `;
+                } else {
+                    content += `<p>5. Le produit \\( A \\cdot B \\) est impossible.</p>`;
+                }
+                
+                if (data.prodBAPossible) {
+                    const resultProdBA = multiplierMatrices(data.B, data.A);
+                    content += `
+                        <h4>6. Calcul du produit \\( B \\cdot A \\) :</h4>
+                        <p class="matrice-latex">
+                            \\( ${afficherMatrice(data.B)} \\cdot ${afficherMatrice(data.A)} = ${afficherMatrice(resultProdBA)} \\)
+                        </p>
+                    `;
+                } else {
+                    content += `<p>6. Le produit \\( B \\cdot A \\) est impossible.</p>`;
+                }
 
-        // Convertit une matrice 2D JavaScript en chaîne LaTeX pour MathJax
-        function matrixToLatex(matrix) {
-            if (!matrix || matrix.length === 0) return '{\\text{Matrice vide}}';
+
+            } else if (exoId === 'E3') { 
+                data = E3_data;
+
+                if (data.X) {
+                    content = `
+                        <h3>Solution de l'équation \\( A \\cdot X = B \\)</h3>
+                        <p>La solution est \\( X = A^{-1} \\cdot B \\). Le résultat est :</p>
+                        <p class="matrice-latex">\\( X = ${afficherMatrice(data.X)} \\)</p>
+                    `;
+                } else {
+                    content = `<p class="error">Impossible de trouver la solution (La matrice \\( A \\) n'est pas inversible).</p>`;
+                }
+            }
+            
+            solutionDiv.innerHTML = `<div class="solution" style="display: block;">${content}</div>`;
+            
+            if (solutionBtn) {
+                solutionBtn.style.display = 'none'; 
+            }
+            MathJax.typesetPromise([solutionDiv]);
+        }
+
+        // ==========================================================
+        // --- LOGIQUE EXERCICE 1 ---
+        // ==========================================================
+        
+        function genererMatricesE1() {
+            let n = Math.floor(Math.random() * 3) + 2; // Lignes de A (2 à 4)
+            let p = Math.floor(Math.random() * 3) + 2; // Colonnes de A (2 à 4)
+            let nPrime = Math.floor(Math.random() * 3) + 2; // Lignes de B
+            let pPrime = Math.floor(Math.random() * 3) + 2; // Colonnes de B
+
+            let A = genererMatrice(n, p);
+            let B = genererMatrice(nPrime, pPrime);
+            
+            E1_data = {
+                A, B, n, p, nPrime, pPrime,
+                sumPossible: (n === nPrime && p === pPrime),
+                prodABPossible: (p === nPrime),
+                prodBAPossible: (pPrime === n),
+                sumDim: n + ' \\times ' + p, 
+                prodABDim: n + ' \\times ' + pPrime, 
+                prodBADim: nPrime + ' \\times ' + p 
+            };
+
+            let matricesDiv = document.getElementById("matricesE1");
+            matricesDiv.innerHTML = `
+                <p>Matrice \\( A \\) de dimension \\( ${n} \\times ${p} \\) :</p>
+                <p class="matrice-latex">\\( ${afficherMatrice(A)} \\)</p>
+                <p>Matrice \\( B \\) de dimension \\( ${nPrime} \\times ${pPrime} \\) :</p>
+                <p class="matrice-latex">\\( ${afficherMatrice(B)} \\)</p>
+            `;
+            
+            document.getElementById("resultatE1").innerHTML = generateE1Questions();
+            document.getElementById("showSolutionBtnE1").style.display = 'block';
+            MathJax.typesetPromise([matricesDiv, document.getElementById("resultatE1")]);
+        }
+        
+        function generateE1Questions() {
+            return `
+                <div class="question-box">
+                    <h3>Questions à résoudre :</h3>
+                    
+                    <p>1. La somme \\( A + B \\) est-elle possible ? Si oui, quelle est la dimension ?</p>
+                    <p>2. Le produit \\( A \\cdot B \\) est-il possible ? Si oui, quelle est la dimension ?</p>
+                    <p>3. Le produit \\( B \\cdot A \\) est-il possible ? Si oui, quelle est la dimension ?</p>
+                    
+                    <p>4. Pour les opérations qui sont possibles, réalisez le calcul.</p>
+                </div>
+            `;
+        }
+
+        // ==========================================================
+        // --- LOGIQUE EXERCICE 2 (Inversion) ---
+        // ==========================================================
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function buildCorrectionHTML(A, result) {
+          const n = A.length;
+          let html = `<div class="solution">`;
+          const I_initiale = identityMatrix(n);
+
+          if (!result.success) {
+            html += `<p class="error">La matrice n'est pas inversible. (Déterminant nul)</p>`;
+          } else {
+            html += `<h3>Étapes de Gauss-Jordan :</h3>`;
+            
+            html += `<div class="table-responsive-wrapper">`;
+            html += `
+              <table class="gauss-table">
+                <thead>
+                  <tr>
+                    <th>Opération de ligne</th>
+                    <th>Matrice A (Gauche)</th>
+                    <th>Matrice I (Droite)</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
             
-            const m = matrix.length;
-            const n = matrix[0].length;
-            
-            let content = '';
-            for (let i = 0; i < m; i++) {
-                content += matrix[i].join(' & ');
-                if (i < m - 1) {
-                    content += ' \\\\ ';
-                }
-            }
-            return `\\begin{pmatrix} ${content} \\end{pmatrix}`;
-        }
-        
-        // Multiplie deux matrices A et B
-        function multiplyMatrices(A, B) {
-            const m = A.length;
-            const k = A[0].length;
-            const n = B[0].length;
-
-            if (k !== B.length) {
-                console.error("Incompatible dimensions for multiplication.");
-                return null;
-            }
-
-            const C = Array.from({ length: m }, () => Array(n).fill(0));
-
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    let sum = 0;
-                    for (let l = 0; l < k; l++) {
-                        sum += A[i][l] * B[l][j];
-                    }
-                    C[i][j] = sum;
-                }
-            }
-            return C;
-        }
-        
-        // Calcule le produit k * A
-        function scalarMultiply(k, A) {
-            const m = A.length;
-            const n = A[0].length;
-            const C = Array.from({ length: m }, () => Array(n));
-
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    C[i][j] = k * A[i][j];
-                }
-            }
-            return C;
-        }
-        
-        // Calcule la somme A + B
-        function addMatrices(A, B) {
-            const m = A.length;
-            const n = A[0].length;
-            
-            if (m !== B.length || n !== B[0].length) {
-                console.error("Incompatible dimensions for addition.");
-                return null;
-            }
-
-            const C = Array.from({ length: m }, () => Array(n));
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    C[i][j] = A[i][j] + B[i][j];
-                }
-            }
-            return C;
-        }
-
-
-        // Inverse une matrice carrée (ou tente de la faire) en utilisant l'élimination de Gauss-Jordan.
-        // Fonction simplifiée qui vérifie principalement si la matrice est inversible (déterminant non nul)
-        // et retourne un objet avec 'success' et la matrice inverse si besoin.
-        function gaussJordanInverse(A) {
-            const n = A.length;
-            if (n !== A[0].length) return { success: false }; // Non carrée
-
-            // Créer une matrice augmentée [A | I]
-            let augmentedMatrix = A.map((row, i) => [...row, ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))]);
-
-            // Copie pour ne pas modifier la matrice originale
-            const M = augmentedMatrix.map(row => [...row]);
-
-            for (let i = 0; i < n; i++) {
-                // Trouver le pivot pour la colonne i
-                let maxRow = i;
-                for (let k = i + 1; k < n; k++) {
-                    if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) {
-                        maxRow = k;
-                    }
-                }
-                
-                // Si le pivot est nul, la matrice n'est pas inversible
-                if (Math.abs(M[maxRow][i]) < 1e-9) { 
-                    return { success: false };
-                }
-
-                // Échanger la ligne maxRow avec la ligne i
-                [M[i], M[maxRow]] = [M[maxRow], M[i]];
-
-                // Normaliser la ligne i pour que M[i][i] = 1
-                const pivot = M[i][i];
-                for (let j = i; j < 2 * n; j++) {
-                    M[i][j] /= pivot;
-                }
-
-                // Élimination : mettre des zéros sur le reste de la colonne
-                for (let k = 0; k < n; k++) {
-                    if (k !== i) {
-                        const factor = M[k][i];
-                        for (let j = i; j < 2 * n; j++) {
-                            M[k][j] -= factor * M[i][j];
-                        }
-                    }
-                }
-            }
-
-            // L'inverse est la moitié droite de la matrice augmentée
-            const Inverse = M.map(row => row.slice(n).map(val => Math.round(val))); // Arrondi des entiers
-            return { success: true, inverse: Inverse };
-        }
-        
-        // Résout AX = B si A est inversible (méthode simple A^-1 * B)
-        function resoudreEquation(A, B) {
-            const resultInverse = gaussJordanInverse(A);
-            if (!resultInverse.success) return null;
-            
-            return multiplyMatrices(resultInverse.inverse, B);
-        }
-
-        /* ==========================================================
-                        GÉNÉRATION DES EXERCICES
-                ========================================================== */
-
-        // Exercice 1: Produit de deux matrices
-        function generateE1() {
-            // Matrice A (m x k)
-            const m = getRandomInt(2, 3);
-            const k = getRandomInt(2, 3);
-            const A = createRandomMatrix(m, k, -3, 3);
-            
-            // Matrice B (k x n)
-            const n = getRandomInt(1, 3);
-            const B = createRandomMatrix(k, n, -3, 3);
-            
-            const C = multiplyMatrices(A, B);
-            
-            E1_data = { A, B, C };
-            
-            const problemLatex = `A = ${matrixToLatex(A)} \\quad \\text{et} \\quad B = ${matrixToLatex(B)}`;
-            const question = `Calculer le produit matriciel \\( C = A \\times B \\).`;
-            const solution = matrixToLatex(C);
-            
-            return { question, problemLatex, solution };
-        }
-
-        // Exercice 2: Combinaison linéaire de deux matrices
-        function generateE2() {
-            // Matrices A et B (m x n)
-            const m = getRandomInt(2, 3);
-            const n = getRandomInt(2, 3);
-            const A = createRandomMatrix(m, n, -5, 5);
-            const B = createRandomMatrix(m, n, -5, 5);
-            
-            // Scalaires a et b
-            const a = getRandomInt(2, 4);
-            const b = getRandomInt(1, 3);
-            
-            const aA = scalarMultiply(a, A);
-            const bB = scalarMultiply(b, B);
-            const C = addMatrices(aA, bB);
-
-            E2_data = { A, B, a, b, C };
-
-            const problemLatex = `A = ${matrixToLatex(A)} \\quad \\text{et} \\quad B = ${matrixToLatex(B)}`;
-            const question = `Calculer la matrice \\( C = ${a}A + ${b}B \\).`;
-            const solution = matrixToLatex(C);
-            
-            return { question, problemLatex, solution };
-        }
-
-        // Exercice 3: Résolution d'un système linéaire (AX = B)
-        function generateE3() {
-            let A, B, X;
-            const n = getRandomInt(2, 3); // Taille de la matrice carrée (2x2 ou 3x3)
-            let attempt = 0;
-            
-            do {
-                // S'assurer que la matrice A est inversible
-                A = createRandomMatrix(n, n, -2, 2); 
-                B = createRandomMatrix(n, 1, -5, 5); // Colonne de résultat
-                attempt++;
-                const resultCheck = gaussJordanInverse(A);
-                if(resultCheck.success) {
-                    X = resoudreEquation(A, B);
-                    break;
-                }
-            } while (attempt < 10); 
-            
-            E3_data = { A, B, X };
-
-            let systemLatex = '';
-            // Construire la représentation du système
-            for(let i = 0; i < n; i++) {
-                let equation = '';
-                for(let j = 0; j < n; j++) {
-                    const coef = A[i][j];
-                    if (coef !== 0) {
-                        let sign = (j > 0 && coef > 0) ? '+' : '';
-                        let absCoef = Math.abs(coef);
-                        let coefStr = (absCoef === 1) ? '' : absCoef;
-                        if (coef < 0) sign = '-';
-                        
-                        equation += `${sign}${coefStr}x_{${j+1}}`;
-                    }
-                }
-                equation += ` = ${B[i][0]}`;
-                systemLatex += equation;
-                if (i < n - 1) systemLatex += ' \\\\ ';
-            }
-            
-            const problemLatex = `Résoudre le système : \\[ \\begin{cases} ${systemLatex} \\end{cases} \\]`;
-            
-            const question = `Trouver le vecteur colonne \\( X \\) tel que \\( AX=B \\).`;
-            const solution = X ? matrixToLatex(X) : 'Solution non trouvée (Matrice non inversible)';
-            
-            return { question, problemLatex, solution };
-        }
-
-        // Fonction pour créer la structure HTML d'un exercice
-        function createExerciceHTML(id, title, problem, solution, toggleFn) {
-            const html = `
-                <div class="exercice">
-                    <h2>Exercice ${id} : ${title}</h2>
-                    <div id="problemE${id}">
-                        ${problem}
-                    </div>
-                    <div class="controls">
-                        <button class="toggle-btn" onclick="${toggleFn}('solutionE${id}')">Afficher/Masquer Solution</button>
-                    </div>
-                    <div id="solutionE${id}" class="solution">
-                        <h3>Solution :</h3>
-                        \\[ ${solution} \\]
-                    </div>
-                </div>
+            // Ligne de départ
+            html += `
+                <tr>
+                  <td> Matrice initiale </td>
+                  <td><p class="matrice-latex">\\( ${afficherMatrice(A)} \\)</p></td>
+                  <td><p class="matrice-latex">\\( ${afficherMatrice(I_initiale)} \\)</p></td>
+                </tr>
             `;
-            return html;
-        }
 
-        // Fonction principale pour générer et afficher tous les exercices
-        function generateAllExercises() {
-            const container = document.getElementById('exercices-container');
-            container.innerHTML = ''; // Nettoyer le contenu précédent
-            
-            // Masquer la section des droits d'auteur si elle est affichée
-            document.getElementById('copyright-content').style.display = 'none';
-            // Afficher le container des exercices au cas où il aurait été masqué par toggleCopyright
-            container.style.display = 'block';
+            result.steps.forEach(step => {
+                const matrixA = step.matrix;
+                const matrixI = step.inverse;
 
-            // --- Exercice 1 ---
-            const dataE1 = generateE1();
-            container.innerHTML += createExerciceHTML(1, 'Produit de Matrices', dataE1.problemLatex, dataE1.solution, 'toggleSolution');
+                html += `
+                  <tr>
+                    <td> ${step.op}</td>
+                    <td><p class="matrice-latex">\\( ${afficherMatrice(matrixA)} \\)</p></td>
+                    <td><p class="matrice-latex">\\( ${afficherMatrice(matrixI)} \\)</p></td>
+                  </tr>
+                `;
+            });
+            
+            html += `
+                </tbody>
+              </table>
+              </div>`;
 
-            // --- Exercice 2 ---
-            const dataE2 = generateE2();
-            container.innerHTML += createExerciceHTML(2, 'Combinaison Linéaire', dataE2.problemLatex, dataE2.solution, 'toggleSolution');
 
-            // --- Exercice 3 ---
-            const dataE3 = generateE3();
-            container.innerHTML += createExerciceHTML(3, 'Résolution de Système (AX=B)', dataE3.problemLatex, dataE3.solution, 'toggleSolution');
-            
-            // Mettre à jour MathJax pour rendre toutes les nouvelles formules LaTeX
-            if (window.MathJax) {
-                MathJax.typesetPromise([container]);
-            }
-        }
-        
-        // Fonction pour afficher/masquer la solution
-        function toggleSolution(id) {
-            const element = document.getElementById(id);
-            const isHidden = element.style.display === 'none' || element.style.display === '';
-            element.style.display = isHidden ? 'block' : 'none';
-            
-            // Mettre à jour MathJax sur l'élément s'il est affiché
-            if (isHidden && window.MathJax) {
-                 MathJax.typesetPromise([element]);
-            }
-            
-            // S'assurer que les droits d'auteur sont masqués
-            document.getElementById('copyright-content').style.display = 'none';
-            document.getElementById('exercices-container').style.display = 'block';
-        }
+            html += `<hr/><h3>Inverse finale :</h3>
+                 <p class="matrice-latex">\\( A^{-1} = ${afficherMatrice(result.inverse)} \\)</p>`;
+          }
 
-        // Fonction pour afficher/masquer le contenu des droits d'auteur
-        function toggleCopyright() {
-            const copyrightDiv = document.getElementById('copyright-content');
-            const exercicesContainer = document.getElementById('exercices-container');
-            const isHidden = copyrightDiv.style.display === 'none' || copyrightDiv.style.display === '';
-            
-            // Basculer l'affichage de la section Droits d'Auteur
-            copyrightDiv.style.display = isHidden ? 'block' : 'none';
-            
-            // Masquer les exercices si on affiche les droits, et inversement
-            exercicesContainer.style.display = isHidden ? 'none' : 'block';
-            
-            // Masquer toutes les solutions si on affiche les droits
-            if (isHidden) {
-                 document.querySelectorAll('.solution').forEach(sol => {
-                    sol.style.display = 'none';
-                });
-            }
+          html += `</div>`;
+          return html;
+        }
 
-            // Forcer le rendu MathJax des droits d'auteur si on vient de les afficher
-            if (isHidden && window.MathJax) {
-                 MathJax.typesetPromise([copyrightDiv]);
-            }
-        }
+        function runRandomInverse() {
+            const n = getRandomInt(2, 3);
+            let A;
+            let attempt = 0;
+            let resultCheck;
 
-        /* ==========================================================
-                        INITIALISATION ET ÉVÉNEMENTS
-                ========================================================== */
+            do {
+                A = genererMatrice(n, n);
+                resultCheck = gaussJordanInverse(A);
+                attempt++;
+            } while (!resultCheck.success && attempt < 10);
 
-        document.getElementById('generate-all').addEventListener('click', generateAllExercises);
-        document.getElementById('copyright-btn').addEventListener('click', toggleCopyright);
+            const displayDiv = document.getElementById("matriceDisplay");
+            const correctionBtn = document.getElementById("showCorrectionBtn");
+            const resultDiv = document.getElementById("resultatCorrection");
 
-        // Initialisation: Générer les exercices au chargement de la page
-        document.addEventListener('DOMContentLoaded', () => {
-            // S'assurer que le contenu des droits d'auteur est masqué au départ
-            document.getElementById('copyright-content').style.display = 'none';
-            
-            if (window.MathJax) {
-                // S'assurer que MathJax est prêt avant de générer
-                MathJax.startup.promise.then(generateAllExercises);
-            } else {
-                generateAllExercises();
-            }
-        });
+            if (resultCheck.success) {
+                displayDiv.innerHTML = `<h2>Matrice à inverser (${n}x${n}) :</h2><div class="matrice-latex">\\( A = ${afficherMatrice(A)} \\)</div>`;
+                lastCorrectionHTML = buildCorrectionHTML(A, resultCheck);
+                resultDiv.innerHTML = '';
+                correctionBtn.style.display = 'block';
+                MathJax.typesetPromise([displayDiv]);
+            } else {
+                displayDiv.innerHTML = `<p class="error">Impossible de générer une matrice inversible après plusieurs tentatives. Veuillez réessayer.</p>`;
+                correctionBtn.style.display = 'none';
+                resultDiv.innerHTML = '';
+            }
+        }
 
-    </script>
+
+        function showCorrection() {
+            const resultDiv = document.getElementById("resultatCorrection");
+            
+            if (lastCorrectionHTML) {
+                resultDiv.innerHTML = lastCorrectionHTML;
+                document.getElementById("showCorrectionBtn").style.display = 'none';
+                MathJax.typesetPromise([resultDiv]);
+            }
+        }
+
+
+        // ==========================================================
+        // --- LOGIQUE EXERCICE 3 ---
+        // ==========================================================
+
+        function resoudreEquation(A, B) {
+            let inverseA = inverserMatriceCalcul(A); 
+            if (!inverseA) return null;
+
+            // X = A⁻¹ * B
+            let X = multiplierMatrices(inverseA, B); 
+            return X;
+        }
+
+        function genererMatricesE3() {
+            let n = getRandomInt(2, 3); // Limité à 2x2 ou 3x3
+            let A;
+            let B;
+            let X = null;
+            let attempt = 0;
+
+            do {
+                A = genererMatrice(n, n); 
+                B = genererMatrice(n, 1); // Colonne de résultat
+                attempt++;
+                const resultCheck = gaussJordanInverse(A);
+                if(resultCheck.success) {
+                    X = resoudreEquation(A, B);
+                    break;
+                }
+            } while (attempt < 10); 
+            
+            E3_data = { A, B, X };
+
+            let matricesDiv = document.getElementById("matricesE3");
+            
+            if (attempt >= 10 && !X) {
+                matricesDiv.innerHTML = '<p class="error">Impossible de générer une matrice A inversible compatible. Réessayez.</p>';
+                document.getElementById("showSolutionBtnE3").style.display = 'none';
+                document.getElementById("resultatE3").innerHTML = '';
+                return;
+            }
+
+            matricesDiv.innerHTML = `
+                <p>Résoudre l'équation matricielle \\( A \\cdot X = B \\) :</p>
+                <p class="matrice-latex">
+                    \\( A = ${afficherMatrice(A)} \\)
+                </p>
+                <p class="matrice-latex">
+                    \\( B = ${afficherMatrice(B)} \\)
+                </p>
+                <p>Déterminez la matrice \\( X \\).</p>
+            `;
+
+            document.getElementById("resultatE3").innerHTML = '';
+            document.getElementById("showSolutionBtnE3").style.display = 'block';
+            MathJax.typesetPromise([matricesDiv]);
+        }
+        
+    </script>
 </body>
 </html>
