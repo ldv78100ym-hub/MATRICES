@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices sur les matrices (MathJax)</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* ==========================================================
+                    STYLES GLOBAUX ET MISE EN PAGE
+                ========================================================== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto; /* Centrer le contenu */
+            max-width: 900px; /* Limiter la largeur sur grands écrans */
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        h1 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .exercice {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* ==========================================================
+                    STYLES DES BOUTONS ET CONTRÔLES
+                ========================================================== */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        #generate-all {
+            background-color: #007bff;
+        }
+        #generate-all:hover {
+            background-color: #0056b3;
+        }
+        
+        .toggle-btn {
+            background-color: #28a745;
+        }
+        .toggle-btn:hover {
+            background-color: #1e7e34;
+        }
+        
+        /* Nouveau style pour le bouton Droits d'Auteur */
+        #copyright-btn {
+            background-color: #6c757d; 
+            color: white;
+        }
+        #copyright-btn:hover {
+            background-color: #5a6268;
+        }
+
+
+        /* ==========================================================
+                    STYLES DES RÉSULTATS ET MATRICES
+                ========================================================== */
+        .result, .solution {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+            background-color: #e9f7ef;
+            display: none; /* Caché par défaut */
+            overflow-x: auto;
+        }
+        
+        .solution {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        /* Style spécifique pour la section des droits d'auteur */
+        #copyright-content {
+            border-left-color: #6c757d;
+            background-color: #f8f9fa;
+        }
+        #copyright-content h3 {
+            color: #6c757d;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        #copyright-content ul {
+            text-align: left;
+            margin-left: 20px;
+        }
+
+        /* Style spécifique pour MathJax afin de centrer les matrices et aligner les systèmes */
+        .mjx-chtml {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h1>Exercices sur les Matrices</h1>
+
+    <div class="controls">
+        <button id="generate-all">Générer tous les exercices</button>
+        <button id="copyright-btn">⚖️ Droits d'auteur</button>
+    </div>
+    
+    <div id="copyright-content" class="result">
+        <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+        <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Novembre 2025</p>
+        <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
+        <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+        
+        <h4>Conditions :</h4>
+        <ul>
+            <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
+            <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
+            <li><strong>Attribution :** Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
+        </ul>
+        <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
+    </div>
+
+    <div id="exercices-container">
+        </div>
+
+    <script>
+        // Déclaration des variables pour stocker les données des exercices
+        let E1_data = null; 
+        let E2_data = null;
+        let E3_data = null;
+
+
+        /* ==========================================================
+                        FONCTIONS UTILITAIRES DE BASE
+                ========================================================== */
+
+        // Génère un entier aléatoire
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Crée une matrice de taille m x n avec des entiers aléatoires entre min et max
+        function createRandomMatrix(m, n, min, max) {
+            const matrix = [];
+            for (let i = 0; i < m; i++) {
+                const row = [];
+                for (let j = 0; j < n; j++) {
+                    row.push(getRandomInt(min, max));
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+
+        // Convertit une matrice 2D JavaScript en chaîne LaTeX pour MathJax
+        function matrixToLatex(matrix) {
+            if (!matrix || matrix.length === 0) return '{\\text{Matrice vide}}';
+            
+            const m = matrix.length;
+            const n = matrix[0].length;
+            
+            let content = '';
+            for (let i = 0; i < m; i++) {
+                content += matrix[i].join(' & ');
+                if (i < m - 1) {
+                    content += ' \\\\ ';
+                }
+            }
+            return `\\begin{pmatrix} ${content} \\end{pmatrix}`;
+        }
+        
+        // Multiplie deux matrices A et B
+        function multiplyMatrices(A, B) {
+            const m = A.length;
+            const k = A[0].length;
+            const n = B[0].length;
+
+            if (k !== B.length) {
+                console.error("Incompatible dimensions for multiplication.");
+                return null;
+            }
+
+            const C = Array.from({ length: m }, () => Array(n).fill(0));
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    let sum = 0;
+                    for (let l = 0; l < k; l++) {
+                        sum += A[i][l] * B[l][j];
+                    }
+                    C[i][j] = sum;
+                }
+            }
+            return C;
+        }
+        
+        // Calcule le produit k * A
+        function scalarMultiply(k, A) {
+            const m = A.length;
+            const n = A[0].length;
+            const C = Array.from({ length: m }, () => Array(n));
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    C[i][j] = k * A[i][j];
+                }
+            }
+            return C;
+        }
+        
+        // Calcule la somme A + B
+        function addMatrices(A, B) {
+            const m = A.length;
+            const n = A[0].length;
+            
+            if (m !== B.length || n !== B[0].length) {
+                console.error("Incompatible dimensions for addition.");
+                return null;
+            }
+
+            const C = Array.from({ length: m }, () => Array(n));
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    C[i][j] = A[i][j] + B[i][j];
+                }
+            }
+            return C;
+        }
+
+
+        // Inverse une matrice carrée (ou tente de la faire) en utilisant l'élimination de Gauss-Jordan.
+        // Fonction simplifiée qui vérifie principalement si la matrice est inversible (déterminant non nul)
+        // et retourne un objet avec 'success' et la matrice inverse si besoin.
+        function gaussJordanInverse(A) {
+            const n = A.length;
+            if (n !== A[0].length) return { success: false }; // Non carrée
+
+            // Créer une matrice augmentée [A | I]
+            let augmentedMatrix = A.map((row, i) => [...row, ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))]);
+
+            // Copie pour ne pas modifier la matrice originale
+            const M = augmentedMatrix.map(row => [...row]);
+
+            for (let i = 0; i < n; i++) {
+                // Trouver le pivot pour la colonne i
+                let maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) {
+                        maxRow = k;
+                    }
+                }
+                
+                // Si le pivot est nul, la matrice n'est pas inversible
+                if (Math.abs(M[maxRow][i]) < 1e-9) { 
+                    return { success: false };
+                }
+
+                // Échanger la ligne maxRow avec la ligne i
+                [M[i], M[maxRow]] = [M[maxRow], M[i]];
+
+                // Normaliser la ligne i pour que M[i][i] = 1
+                const pivot = M[i][i];
+                for (let j = i; j < 2 * n; j++) {
+                    M[i][j] /= pivot;
+                }
+
+                // Élimination : mettre des zéros sur le reste de la colonne
+                for (let k = 0; k < n; k++) {
+                    if (k !== i) {
+                        const factor = M[k][i];
+                        for (let j = i; j < 2 * n; j++) {
+                            M[k][j] -= factor * M[i][j];
+                        }
+                    }
+                }
+            }
+
+            // L'inverse est la moitié droite de la matrice augmentée
+            const Inverse = M.map(row => row.slice(n).map(val => Math.round(val))); // Arrondi des entiers
+            return { success: true, inverse: Inverse };
+        }
+        
+        // Résout AX = B si A est inversible (méthode simple A^-1 * B)
+        function resoudreEquation(A, B) {
+            const resultInverse = gaussJordanInverse(A);
+            if (!resultInverse.success) return null;
+            
+            return multiplyMatrices(resultInverse.inverse, B);
+        }
+
+        /* ==========================================================
+                        GÉNÉRATION DES EXERCICES
+                ========================================================== */
+
+        // Exercice 1: Produit de deux matrices
+        function generateE1() {
+            // Matrice A (m x k)
+            const m = getRandomInt(2, 3);
+            const k = getRandomInt(2, 3);
+            const A = createRandomMatrix(m, k, -3, 3);
+            
+            // Matrice B (k x n)
+            const n = getRandomInt(1, 3);
+            const B = createRandomMatrix(k, n, -3, 3);
+            
+            const C = multiplyMatrices(A, B);
+            
+            E1_data = { A, B, C };
+            
+            const problemLatex = `A = ${matrixToLatex(A)} \\quad \\text{et} \\quad B = ${matrixToLatex(B)}`;
+            const question = `Calculer le produit matriciel \\( C = A \\times B \\).`;
+            const solution = matrixToLatex(C);
+            
+            return { question, problemLatex, solution };
+        }
+
+        // Exercice 2: Combinaison linéaire de deux matrices
+        function generateE2() {
+            // Matrices A et B (m x n)
+            const m = getRandomInt(2, 3);
+            const n = getRandomInt(2, 3);
+            const A = createRandomMatrix(m, n, -5, 5);
+            const B = createRandomMatrix(m, n, -5, 5);
+            
+            // Scalaires a et b
+            const a = getRandomInt(2, 4);
+            const b = getRandomInt(1, 3);
+            
+            const aA = scalarMultiply(a, A);
+            const bB = scalarMultiply(b, B);
+            const C = addMatrices(aA, bB);
+
+            E2_data = { A, B, a, b, C };
+
+            const problemLatex = `A = ${matrixToLatex(A)} \\quad \\text{et} \\quad B = ${matrixToLatex(B)}`;
+            const question = `Calculer la matrice \\( C = ${a}A + ${b}B \\).`;
+            const solution = matrixToLatex(C);
+            
+            return { question, problemLatex, solution };
+        }
+
+        // Exercice 3: Résolution d'un système linéaire (AX = B)
+        function generateE3() {
+            let A, B, X;
+            const n = getRandomInt(2, 3); // Taille de la matrice carrée (2x2 ou 3x3)
+            let attempt = 0;
+            
+            do {
+                // S'assurer que la matrice A est inversible
+                A = createRandomMatrix(n, n, -2, 2); 
+                B = createRandomMatrix(n, 1, -5, 5); // Colonne de résultat
+                attempt++;
+                const resultCheck = gaussJordanInverse(A);
+                if(resultCheck.success) {
+                    X = resoudreEquation(A, B);
+                    break;
+                }
+            } while (attempt < 10); 
+            
+            E3_data = { A, B, X };
+
+            let systemLatex = '';
+            // Construire la représentation du système
+            for(let i = 0; i < n; i++) {
+                let equation = '';
+                for(let j = 0; j < n; j++) {
+                    const coef = A[i][j];
+                    if (coef !== 0) {
+                        let sign = (j > 0 && coef > 0) ? '+' : '';
+                        let absCoef = Math.abs(coef);
+                        let coefStr = (absCoef === 1) ? '' : absCoef;
+                        if (coef < 0) sign = '-';
+                        
+                        equation += `${sign}${coefStr}x_{${j+1}}`;
+                    }
+                }
+                equation += ` = ${B[i][0]}`;
+                systemLatex += equation;
+                if (i < n - 1) systemLatex += ' \\\\ ';
+            }
+            
+            const problemLatex = `Résoudre le système : \\[ \\begin{cases} ${systemLatex} \\end{cases} \\]`;
+            
+            const question = `Trouver le vecteur colonne \\( X \\) tel que \\( AX=B \\).`;
+            const solution = X ? matrixToLatex(X) : 'Solution non trouvée (Matrice non inversible)';
+            
+            return { question, problemLatex, solution };
+        }
+
+        // Fonction pour créer la structure HTML d'un exercice
+        function createExerciceHTML(id, title, problem, solution, toggleFn) {
+            const html = `
+                <div class="exercice">
+                    <h2>Exercice ${id} : ${title}</h2>
+                    <div id="problemE${id}">
+                        ${problem}
+                    </div>
+                    <div class="controls">
+                        <button class="toggle-btn" onclick="${toggleFn}('solutionE${id}')">Afficher/Masquer Solution</button>
+                    </div>
+                    <div id="solutionE${id}" class="solution">
+                        <h3>Solution :</h3>
+                        \\[ ${solution} \\]
+                    </div>
+                </div>
+            `;
+            return html;
+        }
+
+        // Fonction principale pour générer et afficher tous les exercices
+        function generateAllExercises() {
+            const container = document.getElementById('exercices-container');
+            container.innerHTML = ''; // Nettoyer le contenu précédent
+            
+            // Masquer la section des droits d'auteur si elle est affichée
+            document.getElementById('copyright-content').style.display = 'none';
+            // Afficher le container des exercices au cas où il aurait été masqué par toggleCopyright
+            container.style.display = 'block';
+
+            // --- Exercice 1 ---
+            const dataE1 = generateE1();
+            container.innerHTML += createExerciceHTML(1, 'Produit de Matrices', dataE1.problemLatex, dataE1.solution, 'toggleSolution');
+
+            // --- Exercice 2 ---
+            const dataE2 = generateE2();
+            container.innerHTML += createExerciceHTML(2, 'Combinaison Linéaire', dataE2.problemLatex, dataE2.solution, 'toggleSolution');
+
+            // --- Exercice 3 ---
+            const dataE3 = generateE3();
+            container.innerHTML += createExerciceHTML(3, 'Résolution de Système (AX=B)', dataE3.problemLatex, dataE3.solution, 'toggleSolution');
+            
+            // Mettre à jour MathJax pour rendre toutes les nouvelles formules LaTeX
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]);
+            }
+        }
+        
+        // Fonction pour afficher/masquer la solution
+        function toggleSolution(id) {
+            const element = document.getElementById(id);
+            const isHidden = element.style.display === 'none' || element.style.display === '';
+            element.style.display = isHidden ? 'block' : 'none';
+            
+            // Mettre à jour MathJax sur l'élément s'il est affiché
+            if (isHidden && window.MathJax) {
+                 MathJax.typesetPromise([element]);
+            }
+            
+            // S'assurer que les droits d'auteur sont masqués
+            document.getElementById('copyright-content').style.display = 'none';
+            document.getElementById('exercices-container').style.display = 'block';
+        }
+
+        // Fonction pour afficher/masquer le contenu des droits d'auteur
+        function toggleCopyright() {
+            const copyrightDiv = document.getElementById('copyright-content');
+            const exercicesContainer = document.getElementById('exercices-container');
+            const isHidden = copyrightDiv.style.display === 'none' || copyrightDiv.style.display === '';
+            
+            // Basculer l'affichage de la section Droits d'Auteur
+            copyrightDiv.style.display = isHidden ? 'block' : 'none';
+            
+            // Masquer les exercices si on affiche les droits, et inversement
+            exercicesContainer.style.display = isHidden ? 'none' : 'block';
+            
+            // Masquer toutes les solutions si on affiche les droits
+            if (isHidden) {
+                 document.querySelectorAll('.solution').forEach(sol => {
+                    sol.style.display = 'none';
+                });
+            }
+
+            // Forcer le rendu MathJax des droits d'auteur si on vient de les afficher
+            if (isHidden && window.MathJax) {
+                 MathJax.typesetPromise([copyrightDiv]);
+            }
+        }
+
+        /* ==========================================================
+                        INITIALISATION ET ÉVÉNEMENTS
+                ========================================================== */
+
+        document.getElementById('generate-all').addEventListener('click', generateAllExercises);
+        document.getElementById('copyright-btn').addEventListener('click', toggleCopyright);
+
+        // Initialisation: Générer les exercices au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            // S'assurer que le contenu des droits d'auteur est masqué au départ
+            document.getElementById('copyright-content').style.display = 'none';
+            
+            if (window.MathJax) {
+                // S'assurer que MathJax est prêt avant de générer
+                MathJax.startup.promise.then(generateAllExercises);
+            } else {
+                generateAllExercises();
+            }
+        });
+
+    </script>
+</body>
+</html>
