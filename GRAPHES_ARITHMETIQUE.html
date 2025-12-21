@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphes et Arithmétique Modulaire</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #87CEEB;
+            --text-color: #e0e0e0;
+            --accent-color: #00d2ff;
+            --highlight-color: #ff3333;
+            --panel-bg: #2a2a2a;
+            --modal-overlay: rgba(0, 0, 0, 0.85);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: black;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 5px solid var(--primary);
+        }
+
+        h1 { margin-bottom: 5px; color: var(--accent-color); }
+        .latex-container { margin-bottom: 20px; font-size: 1.1em; }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 50%;
+            background-color: #000;
+        }
+
+        canvas {
+            display: block;
+            border-radius: 50%;
+        }
+
+        .controls {
+            background-color: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            height: fit-content;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        label { font-weight: bold; display: flex; justify-content: space-between; }
+        span.val { color: var(--accent-color); font-family: monospace; }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .info-box {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #aaa;
+            border-top: 1px solid #444;
+            padding-top: 10px;
+        }
+
+        /* Styles des Boutons */
+        button {
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+        .btn-action:hover { background-color: #66e0ff; }
+
+        /* Bouton rouge pour le pas-à-pas */
+        .btn-step {
+            background-color: #d63031;
+            color: white;
+        }
+        .btn-step:hover { background-color: #ff4d4d; }
+
+        .btn-explain {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+            margin-top: 5px;
+        }
+        .btn-explain:hover { background-color: #555; }
+
+        .btn-copyright {
+            background-color: transparent;
+            color: #888;
+            border: 1px dashed #444;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+        .btn-copyright:hover { color: #fff; border-color: #666; }
+
+        .btn-toggle {
+            background-color: #333;
+            color: #aaa;
+            border: 1px solid #555;
+        }
+        .btn-toggle:hover { background-color: #444; }
+        
+        .btn-toggle.active {
+            background-color: var(--accent-color);
+            color: #000;
+            border-color: var(--accent-color);
+        }
+
+        /* --- Styles de la Modal (Popup) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .modal-body h2 { color: var(--accent-color); border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .modal-body h3 { color: #fff; margin-top: 20px; }
+        .modal-body p { line-height: 1.6; color: #ddd; }
+        .example-box {
+            background: #222;
+            padding: 15px;
+            border-left: 3px solid var(--accent-color);
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .copyright-text { font-size: 0.9em; color: #aaa; }
+        .copyright-text strong { color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Arithmétique Modulaire & Théorie des Graphes</h1>
+        <div class="latex-container">
+            Visualisation du graphe orienté \( G(V, E) \) défini par :
+            \[ V = \{0, 1, \dots, n-1\} \]
+            \[ E = \{(x, y) \mid y \equiv x \cdot k \pmod n\} \]
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="canvas-container">
+            <canvas id="graphCanvas" width="650" height="650"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Modulo \( (n) \) : <span id="nVal" class="val">50</span></label>
+                <input type="range" id="pointsInput" min="10" max="500" value="50">
+            </div>
+
+            <div class="control-group">
+                <label>Multiplicateur \( (k) \) : <span id="kVal" class="val">2.0</span></label>
+                <input type="range" id="multInput" min="1" max="100" step="0.01" value="2">
+            </div>
+
+            <button id="labelsBtn" class="btn-toggle">Afficher les nombres</button>
+            
+            <div style="display: flex; gap: 10px;">
+                <button id="animateBtn" class="btn-action" style="flex: 1;">Auto k</button>
+                <button id="stepBtn" class="btn-step" style="flex: 1;">Pas-à-Pas</button>
+            </div>
+            
+            <button id="explainBtn" class="btn-explain">Comprendre le Graphique</button>
+            
+            <button id="copyrightBtn" class="btn-copyright">© Crédits / Droits d'auteur</button>
+
+            <div class="info-box">
+                <p><strong>Note :</strong></p>
+                <ul>
+                    <li>Si \( k=2 \), on obtient une <em>Cardioïde</em>.</li>
+                    <li>Si \( k=3 \), on obtient une <em>Néphroïde</em>.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="explanationModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('explanationModal').style.display='none'">&times;</span>
+            <div class="modal-body">
+                <h2>Comment lire ce graphique ?</h2>
+                <p>Cette visualisation marie la géométrie et la théorie des nombres.</p>
+                <h3>1. Le Cercle (L'Horloge)</h3>
+                <p>Imaginez une horloge avec \( n \) graduations numérotées de \( 0 \) à \( n-1 \).</p>
+                <h3>2. La Règle de Connexion</h3>
+                <p>La formule magique est : \[ y = (x \times k) \pmod n \]</p>
+                <div class="example-box">
+                    <strong>Exemple :</strong> Si \( n = 10 \) et \( k=2 \).<br>
+                    Le point <strong>6</strong> se connecte à \( 12 \pmod{10} = \mathbf{2} \).
+                </div>
+                <h3>3. L'Animation Pas-à-Pas</h3>
+                <p>Utilisez le bouton rouge <strong>Pas-à-Pas</strong> pour voir les connexions se créer une par une (en rouge).</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="copyrightModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('copyrightModal').style.display='none'">&times;</span>
+            <div class="modal-body">
+                <div style="text-align:center; padding:10px;">
+                <h2 style="color:var(--primary); margin-bottom:10px;">📜 Droits d'auteur & À propos</h2>
+                <p style="font-size:1.2rem; font-weight:bold; color:#1e293b;">Analyseur de Graphes Expert - v2.2</p>
+                <div style="margin:20px auto; width:60px; height:3px; background:#e2e8f0; border-radius:3px;"></div>
+                
+                <p style="color:#475569; max-width:600px; margin:auto; line-height:1.6;">
+                    Ce logiciel interactif est conçu pour l'enseignement et l'apprentissage de la <strong>Théorie des Graphes</strong>.
+<br>
+		    <strong>Auteur : Yann Merdy</strong> (yann.merdy@gmail.com) - Décembre 2025<br>
+
+Licence d'Utilisation Non Commerciale.<br>
+Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.<br>
+
+<strong>Conditions :</strong><br>
+Utilisation Privée et Éducative (Autorisée) : Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu uniquement à des fins personnelles, éducatives et non lucratives.<br>
+Utilisation Commerciale (Interdite) : Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins commerciales, lucratives ou professionnelles est strictement interdite sans un accord écrit préalable et explicite de l'auteur.<br>
+Attribution : Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.
+Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.
+                </p>
+
+                <div style="display:flex; justify-content:center; gap:15px; margin:25px 0;">
+                    <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; flex:1; max-width:250px;">
+                        <strong style="display:block; margin-bottom:5px; color:var(--secondary);">🛠️ Technologies</strong>
+                        <ul style="padding-left:0; list-style:none; font-size:0.9rem; color:#64748b; margin:0;">
+                            <li>HTML5 Canvas</li>
+                            <li>Vanilla JavaScript</li>
+                            <li>MathJax (Rendu LaTeX)</li>
+                        </ul>
+                    </div>
+                     <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; flex:1; max-width:250px;">
+                        <strong style="display:block; margin-bottom:5px; color:var(--secondary);">⚖️ Licence</strong>
+                        <p style="font-size:0.9rem; color:#64748b; margin:0;">
+                            Usage libre à des fins pédagogiques.<br>
+                            Tous droits réservés.
+                        </p>
+                    </div>
+                </div>
+                
+                <p style="font-size:0.85rem; color:#94a3b8; margin-top:20px;">© 2025 - Outil de Simulation Mathématique</p>
+                <button class="btn btn-primary" style="margin:20px auto 0;" onclick="closeModal()">Fermer</button>
+            </div>
+ 
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const pointsInput = document.getElementById('pointsInput');
+        const multInput = document.getElementById('multInput');
+        const nVal = document.getElementById('nVal');
+        const kVal = document.getElementById('kVal');
+        
+        // Boutons
+        const animateBtn = document.getElementById('animateBtn');
+        const stepBtn = document.getElementById('stepBtn');
+        const labelsBtn = document.getElementById('labelsBtn');
+        const explainBtn = document.getElementById('explainBtn');
+        const copyrightBtn = document.getElementById('copyrightBtn');
+        
+        // Modals
+        const explainModal = document.getElementById('explanationModal');
+        const copyrightModal = document.getElementById('copyrightModal');
+
+        // Variables d'état globales
+        let n = parseInt(pointsInput.value);
+        let k = parseFloat(multInput.value);
+        let showLabels = false; 
+        
+        // Gestion des animations
+        let animationFrameId = null;
+        let isAutoAnimating = false;
+        
+        let stepIntervalId = null;
+        let isStepAnimating = false;
+        let currentStepIndex = -1;
+
+        // Configuration Géométrie
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) - 45; 
+
+        function draw() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Cercle principal
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Pré-calcul des coordonnées
+            const points = [];
+            
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 0; i < n; i++) {
+                const angle = (2 * Math.PI * i) / n - Math.PI / 2; 
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                points.push({x, y, angle});
+
+                if (showLabels || isStepAnimating) {
+                    const labelRadius = radius + 25;
+                    const labelX = centerX + labelRadius * Math.cos(angle);
+                    const labelY = centerY + labelRadius * Math.sin(angle);
+                    
+                    ctx.fillStyle = (isStepAnimating && i !== currentStepIndex) ? '#555' : '#aaa';
+                    
+                    if (n <= 120 || i % 5 === 0 || isStepAnimating) { 
+                        ctx.fillText(i, labelX, labelY);
+                    }
+                }
+            }
+
+            // Dessin des arêtes
+            ctx.lineWidth = 0.5;
+            const hue = (k * 10) % 360;
+            ctx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.4)`;
+
+            for (let i = 0; i < n; i++) {
+                const targetValue = (i * k) % n;
+                const angleTarget = (2 * Math.PI * targetValue) / n - Math.PI / 2;
+                const targetX = centerX + radius * Math.cos(angleTarget);
+                const targetY = centerY + radius * Math.sin(angleTarget);
+
+                ctx.beginPath();
+                ctx.moveTo(points[i].x, points[i].y);
+                ctx.lineTo(targetX, targetY);
+                ctx.stroke();
+            }
+
+            // --- Mise en évidence Pas-à-Pas ---
+            if (isStepAnimating && currentStepIndex >= 0 && currentStepIndex < n) {
+                const idx = currentStepIndex;
+                const targetVal = (idx * k) % n;
+                
+                const angleTarget = (2 * Math.PI * targetVal) / n - Math.PI / 2;
+                const tX = centerX + radius * Math.cos(angleTarget);
+                const tY = centerY + radius * Math.sin(angleTarget);
+
+                // Ligne Rouge
+                ctx.beginPath();
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 3;
+                ctx.moveTo(points[idx].x, points[idx].y);
+                ctx.lineTo(tX, tY);
+                ctx.stroke();
+
+                // Nombres Rouge/Gras
+                ctx.fillStyle = '#ff0000';
+                ctx.font = 'bold 14px Arial';
+
+                const labelR = radius + 25;
+                const srcLabelX = centerX + labelR * Math.cos(points[idx].angle);
+                const srcLabelY = centerY + labelR * Math.sin(points[idx].angle);
+                ctx.fillText(idx, srcLabelX, srcLabelY);
+
+                const targetIdxInt = Math.round(targetVal);
+                if (targetIdxInt < n) {
+                   const angleT = (2 * Math.PI * targetIdxInt) / n - Math.PI / 2;
+                   const destLabelX = centerX + labelR * Math.cos(angleT);
+                   const destLabelY = centerY + labelR * Math.sin(angleT);
+                   ctx.fillText(targetIdxInt, destLabelX, destLabelY);
+                }
+            }
+        }
+
+        function update() {
+            n = parseInt(pointsInput.value);
+            k = parseFloat(multInput.value);
+            nVal.textContent = n;
+            kVal.textContent = k.toFixed(2);
+            draw();
+        }
+
+        function stopAllAnimations() {
+            isAutoAnimating = false;
+            cancelAnimationFrame(animationFrameId);
+            animateBtn.textContent = "Auto k";
+            animateBtn.style.backgroundColor = '';
+
+            isStepAnimating = false;
+            clearInterval(stepIntervalId);
+            stepBtn.textContent = "Pas-à-Pas";
+            stepBtn.style.backgroundColor = '';
+            currentStepIndex = -1;
+        }
+
+        function animateAutoK() {
+            if (!isAutoAnimating) return;
+            let currentK = parseFloat(multInput.value);
+            currentK += 0.01; 
+            if (currentK > 100) currentK = 0;
+            multInput.value = currentK;
+            update();
+            animationFrameId = requestAnimationFrame(animateAutoK);
+        }
+
+        function tickStep() {
+            currentStepIndex++;
+            if (currentStepIndex >= n) currentStepIndex = 0;
+            draw();
+        }
+
+        // --- Event Listeners ---
+
+        animateBtn.addEventListener('click', () => {
+            if (isAutoAnimating) {
+                stopAllAnimations();
+                update();
+            } else {
+                stopAllAnimations();
+                isAutoAnimating = true;
+                animateBtn.textContent = "Stop";
+                animateBtn.style.backgroundColor = '#ff4444';
+                animateAutoK();
+            }
+        });
+
+        stepBtn.addEventListener('click', () => {
+            if (isStepAnimating) {
+                stopAllAnimations();
+                update();
+            } else {
+                stopAllAnimations();
+                isStepAnimating = true;
+                currentStepIndex = -1;
+                stepBtn.textContent = "Stop Pas-à-Pas";
+                stepBtn.style.backgroundColor = '#ff4444';
+                
+                if (!showLabels) {
+                    labelsBtn.classList.add('active');
+                    labelsBtn.textContent = "Masquer les nombres";
+                    showLabels = true;
+                }
+                tickStep();
+                stepIntervalId = setInterval(tickStep, 600);
+            }
+        });
+
+        labelsBtn.addEventListener('click', () => {
+            showLabels = !showLabels;
+            if (showLabels) {
+                labelsBtn.classList.add('active');
+                labelsBtn.textContent = "Masquer les nombres";
+            } else {
+                labelsBtn.classList.remove('active');
+                labelsBtn.textContent = "Afficher les nombres";
+            }
+            draw();
+        });
+
+        // Modals Logic
+        explainBtn.addEventListener('click', () => explainModal.style.display = 'flex');
+        copyrightBtn.addEventListener('click', () => copyrightModal.style.display = 'flex');
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === explainModal) explainModal.style.display = 'none';
+            if (e.target === copyrightModal) copyrightModal.style.display = 'none';
+        });
+
+        pointsInput.addEventListener('input', () => {
+            stopAllAnimations();
+            update();
+        });
+        
+        multInput.addEventListener('input', () => {
+            if (isStepAnimating) stopAllAnimations();
+            update();
+        });
+
+        update();
+
+    </script>
+</body>
+</html>
